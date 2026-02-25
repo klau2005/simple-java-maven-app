@@ -1,19 +1,47 @@
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            yaml '''
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    app: jenkins-agent
+spec:
+  containers:
+  - name: maven
+    image: maven:3.9.9-eclipse-temurin-17
+    command: 'cat'
+    tty: true
+  - name: docker
+    image: docker:20.10-dind
+    command: 'cat'
+    tty: true
+    privileged: true
+    volumeMounts:
+    - name: docker-sock
+      mountPath: /var/run/docker.sock
+  volumes:
+  - name: docker-sock
+    hostPath:
+      path: /var/run/docker.sock
+'''
     options {
         skipStagesAfterUnstable()
     }
     stages {
         stage('Build') {
             steps {
-                sh 'apt update';
-                sh 'apt install -y maven';
-                sh 'mvn -B -DskipTests clean package';
+                container('maven') {
+                    sh 'mvn -B -DskipTests clean package';
+                }
             }
         }
         stage('Test') {
             steps {
-                sh 'mvn test';
+                container('maven') {
+                    sh 'mvn test';
+                }
             }
             post {
                 always {
@@ -23,7 +51,9 @@ pipeline {
         }
         stage('Deliver') { 
             steps {
-                sh './jenkins/scripts/deliver.sh';
+                container('maven') {
+                    sh './jenkins/scripts/deliver.sh';
+                }
             }
         }
     }
