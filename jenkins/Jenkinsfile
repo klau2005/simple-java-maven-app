@@ -1,16 +1,22 @@
 pipeline {
     agent {
         kubernetes {
-            containerTemplate {
-                name 'maven'
-                image 'maven:3.9.12-sapmachine-21'
-                command 'sleep'
-                args '9999999'
-            }
-            containerTemplate {
-                name 'docker'
-                image 'docker:dind'
-            }
+            yaml '''
+              apiVersion: v1
+              kind: Pod
+              spec:
+                containers:
+                - name: maven
+                  image: maven:3.9.9-eclipse-temurin-17
+                  command:
+                  - cat
+                  tty: true
+                - name: docker
+                  image: docker:dind
+                  command:
+                  - cat
+                  tty: true
+            '''
         }
     }
     stages {
