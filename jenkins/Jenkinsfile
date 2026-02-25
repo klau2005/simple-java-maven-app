@@ -1,35 +1,14 @@
 pipeline {
     agent {
         kubernetes {
-            yaml '''
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    app: jenkins-agent
-spec:
-  containers:
-  - name: maven
-    image: maven:3.9.9-eclipse-temurin-17
-    command: 'cat'
-    tty: true
-  - name: docker
-    image: docker:20.10-dind
-    command: 'cat'
-    tty: true
-    privileged: true
-    volumeMounts:
-    - name: docker-sock
-      mountPath: /var/run/docker.sock
-  volumes:
-  - name: docker-sock
-    hostPath:
-      path: /var/run/docker.sock
-'''
+            label 'maven'
+            containerTemplate {
+                name 'maven'
+                image 'maven:3.9.12-sapmachine-21'
+                command 'sleep'
+                args '9999999'
+            }
         }
-    }
-    options {
-        skipStagesAfterUnstable()
     }
     stages {
         stage('Build') {
