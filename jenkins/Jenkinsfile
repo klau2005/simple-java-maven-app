@@ -13,6 +13,8 @@ pipeline {
                   tty: true
                 - name: docker
                   image: docker:dind
+                  securityContext:
+                    privileged: true
                   tty: true
             '''
         }
