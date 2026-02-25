@@ -1,10 +1,16 @@
 pipeline {
     agent {
         kubernetes {
-            label 'maven'
+            label 'maven dind'
             containerTemplate {
                 name 'maven'
                 image 'maven:3.9.12-sapmachine-21'
+                command 'sleep'
+                args '9999999'
+            }
+            containerTemplate {
+                name 'docker'
+                image 'docker:dind'
                 command 'sleep'
                 args '9999999'
             }
@@ -34,6 +40,13 @@ pipeline {
             steps {
                 container('maven') {
                     sh './jenkins/scripts/deliver.sh';
+                }
+            }
+        }
+        stage('Docker') { 
+            steps {
+                container('docker') {
+                    sh 'docker ps';
                 }
             }
         }
