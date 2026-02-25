@@ -26,6 +26,8 @@ spec:
     hostPath:
       path: /var/run/docker.sock
 '''
+        }
+    }
     options {
         skipStagesAfterUnstable()
     }
