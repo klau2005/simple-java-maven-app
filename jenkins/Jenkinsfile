@@ -49,6 +49,7 @@ pipeline {
         stage('Docker') { 
             steps {
                 container('docker') {
+                    sh 'service docker start';
                     sh 'docker ps';
                 }
             }
